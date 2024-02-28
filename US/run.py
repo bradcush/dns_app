@@ -11,19 +11,21 @@ app = Flask(__name__)
 def get_ip_address(hostname, as_ip, as_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     request = f"TYPE=A\nNAME={hostname}"
-    sock.sendto(bytes(request, "utf-8"), (as_ip, as_port))
+    sock.sendto(request.encode(), (as_ip, as_port))
 
     try:
-        response = sock.recvfrom(1024)
+        response = sock.recvfrom(2048)
+        sock.close()
         print(f"Received {response}")
-        # Parse the IP address from response in expected location
-        return response[0].decode("utf-8").split("\n")[2].split("=")[1]
+        # Parse IP address from response in expected location
+        return response[0].decode().split("\n")[2].split("=")[1]
     except socket.timeout:
+        sock.close()
         print("An error occurred")
-    # Understand how to deal with closing
-    # sockets on the client and server
 
 
+# Contact FS given a hostname to get the
+# nth fibonacci number in a sequence
 @app.route("/fibonacci")
 def fibonacci():
     args = request.args

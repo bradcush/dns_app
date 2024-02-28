@@ -9,21 +9,24 @@ app = Flask(__name__)
 # authoritative name server over UDP
 def register_hostname(hostname, ip, as_ip, as_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Format required for DNS record to be registered
     request = f"TYPE=A\nNAME={hostname}\nVALUE={ip}\nTTL=10"
-    sock.sendto(bytes(request, "utf-8"), (as_ip, as_port))
+    sock.sendto(request.encode(), (as_ip, as_port))
 
     try:
-        response = sock.recvfrom(1024)
+        response = sock.recvfrom(2048)
+        sock.close()
         print(f"Received {response}")
         # We expect to receive a success message
-        return response[0].decode("utf-8") == "SUCCESS"
+        return response[0].decode() == "SUCCESS"
     except socket.timeout:
+        sock.close()
         print("An error occurred")
         return False
-    # Understand how to deal with closing
-    # sockets on the client and server
 
 
+# Register a hostname and IP address
+# with an authoritative DNS server
 @app.route("/register", methods=["PUT"])
 def register():
     body = request.get_json()
@@ -56,6 +59,8 @@ def fib(n):
     return first
 
 
+# Calculate and return the nth
+# fibonacci number in a sequence
 @app.route("/fibonacci")
 def fibonacci():
     args = request.args
