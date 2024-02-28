@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.11
 
 RUN apt-get update \
   && apt-get clean \
@@ -11,7 +11,7 @@ RUN groupadd -g 799 nyu && \
 
 WORKDIR /app
 
-RUN pip install socket Flask
+RUN pip install Flask
 
 USER nyu
 

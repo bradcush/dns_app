@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.11
 
 RUN apt-get update \
   && apt-get clean \
@@ -10,8 +10,6 @@ RUN groupadd -g 799 nyu && \
     useradd -r -u 999 -g nyu nyu
 
 WORKDIR /app
-
-RUN pip install socket
 
 USER nyu
 
